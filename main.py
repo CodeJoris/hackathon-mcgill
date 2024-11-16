@@ -22,25 +22,8 @@ TEXT_COLOR = (255, 255, 255)
 FONT = pygame.font.Font(None, 12)
 
 # Button properties
-button_rect = pygame.Rect(10, 10, 50, 50)  # x, y, width, height
-button_text = "Add Mass"
-
-# Slider properties
-slider_x = 20  # Starting X position of the slider
-slider_y = 15  # Y position of the slider
-slider_width = 600  # Width of the slider bar
-slider_height = 10  # Height of the slider bar
-slider_handle_width = 20  # Width of the slider handle
-slider_handle_height = 20  # Height of the slider handle
-
-# Initial slider value (percentage)
-slider_value = 0.5  # Value between 0 and 1 (50%)
-slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)  # Initial handle position
-
-# Variables
-running = True
-slider_visible = False  # Controls whether the slider is visible
-dragging = False        # Tracks if the slider handle is being dragged
+button_rect = pygame.rect(10,10,30,30)
+button_text = "Add mass"
 
 # Create screen and clock
 screen = pygame.display.set_mode(DIMENSIONS)
