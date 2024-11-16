@@ -14,4 +14,7 @@ class Vector:
     return self.vec
 
   def polar_angle(self):
-    return arctan(y_coord/x_coord) 
+    return arctan(self.y_coord/self.x_coord) 
+    
+  def pixels_to_meters(self):
+    return self.vec*(1.5*10**11/300)
