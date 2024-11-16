@@ -29,3 +29,5 @@ class Mass:
     norm_acceleration = -G*other.get_mass()/(distance**2)
     acceleration = v.Vector(norm_acceleration*cos(theta),norm_acceleration*sin(theta))
     return acceleration
+  
+  
