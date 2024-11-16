@@ -3,9 +3,12 @@ import numpy as np
 import sys, pygame, time, os
 from pygame.locals import *
 from random import randint, choice
+
+
 import Mass as m
 import Vector as v
 from math import cos,sin 
+# >>>>>>> cb61859c766c4646f5cde64f6ff4895c0f046f99
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,30)
 #Configuration
 DIMENSIONS = WIDTH, HEIGHT =(1000,1000)
