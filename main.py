@@ -30,9 +30,11 @@ rafraichissement = pygame.time.Clock()
 BACKGROUND = (100,100,100)
 pygame.init()
 ### Definition of our two masses using class Mass ###
-sun = m.Mass("Sun",6.957*10, 1.989*10**30,WIDTH/2,HEIGHT/2,(0,0),(255,255,0))
-earth = m.Mass("Earth",0.7*6.378, 5.9722*10**27,(WIDTH/2)+300,HEIGHT/2,(0,-1),(0,0,255))
+sun = m.Mass("Sun",6.957*10, 1.989*10**30,WIDTH/2,HEIGHT/2,(1,0),(255,255,0))
+earth = m.Mass("Earth",0.7*6.378, 5.9722*10**27,(WIDTH/2)+300,HEIGHT/2,(0,-0.5),(0,0,255))
 moon = m.Mass("Moon",0.7*6.378, 5.9722*10**22,(WIDTH/2)+305,HEIGHT/2,(0,-0.6),(255,0,0))
+#sun = m.Mass("Earth",0.7*6.378, 5.9722*10**29,(WIDTH/2)-30,HEIGHT/2,(0,0.1),(0,0,255))
+
 
 # Initial slider value (percentage)
 slider_value = 0.5  # Value between 0 and 1 (50%)
@@ -42,7 +44,7 @@ dragging = False
 
 trail = []
 running = True
-slider=True
+slider=False
 while running:
     if slider:
         for event in pygame.event.get():
@@ -103,14 +105,16 @@ while running:
 
         # Draw a sun
         earth.update_position()
-        moon.update_position()
+        #sun.update_position()
+        #moon.update_position()
         earth.apply_acceleration_due_to(sun)
-        moon.apply_acceleration_due_to(earth)
+        #moon.apply_acceleration_due_to(earth)
+        #sun.apply_acceleration_due_to(earth)
         
     
         
 
-        pygame.draw.circle(screen, moon.color, moon.pygame_position(), moon.radius)
+        #pygame.draw.circle(screen, moon.color, moon.pygame_position(), moon.radius)
         pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
         pygame.draw.circle(screen, earth.color, earth_pos, earth.radius)
 
