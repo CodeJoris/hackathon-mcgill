@@ -12,6 +12,3 @@ class Vector:
   
   def unit_vector(self):
     return self.vec 
-  
-  def polar_angle(self):
-    return arctan(y_coord/x_coord)
