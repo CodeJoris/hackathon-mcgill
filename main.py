@@ -1,127 +1,114 @@
-### Main Code ###
 import numpy as np
-import sys, pygame, time, os
+import sys, pygame, os
 from pygame.locals import *
-from random import randint, choice
-
+from math import cos, sin
 
 import Mass as m
-from math import cos,sin 
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+DIMENSIONS = WIDTH, HEIGHT = (1000, 800)
+CENTER = (WIDTH / 2, HEIGHT / 2)
 
 # Slider properties
-slider_x = 100  # Starting X position of the slider
-slider_y = 300  # Y position of the slider
-slider_width = 600  # Width of the slider bar
-slider_height = 10  # Height of the slider bar
-slider_handle_width = 20  # Width of the slider handle
-slider_handle_height = 20  # Height of the slider handle
+slider_x = 100
+slider_y = 900  # Position it below the simulation area
+slider_width = 600
+slider_height = 10
+slider_handle_width = 20
+slider_handle_height = 20
 
-# >>>>>>> cb61859c766c4646f5cde64f6ff4895c0f046f99
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,30)
-#Configuration
-DIMENSIONS = WIDTH, HEIGHT =(1000,1000)
-CENTER=(DIMENSIONS[0]/2,DIMENSIONS[1]/2)
 
-VITESSE=10
 
+slider_value = 0.5  # Initial slider value
+slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)
+
+# Button properties
+button_rect = pygame.rect(10,10,30,30)
+button_text = "Add mass"
+
+# Create screen and clock
 screen = pygame.display.set_mode(DIMENSIONS)
-rafraichissement = pygame.time.Clock()
+clock = pygame.time.Clock()
 
-BACKGROUND = (100,100,100)
-pygame.init()
-### Definition of our two masses using class Mass ###
-sun = m.Mass("Sun",6.957*10, 1.989*10**30,WIDTH/2,HEIGHT/2,(1,0),(255,255,0))
-earth = m.Mass("Earth",0.7*6.378, 5.9722*10**27,(WIDTH/2)+300,HEIGHT/2,(0,-0.5),(0,0,255))
-moon = m.Mass("Moon",0.7*6.378, 5.9722*10**22,(WIDTH/2)+305,HEIGHT/2,(0,-0.6),(255,0,0))
-#sun = m.Mass("Earth",0.7*6.378, 5.9722*10**29,(WIDTH/2)-30,HEIGHT/2,(0,0.1),(0,0,255))
+# Background color
+BACKGROUND = (30, 30, 30)
 
-
-# Initial slider value (percentage)
-slider_value = 0.5  # Value between 0 and 1 (50%)
-slider_handle_x = slider_x + slider_value * (WIDTH - slider_handle_width)  # Calculate the initial handle position
-
-dragging = False
+# Create Masses
+sun = m.Mass("Sun", 6.957 * 10, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (1, 0), (255, 255, 0))
+earth = m.Mass("Earth", 0.7 * 6.378, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -0.5), (0, 0, 255))
 
 trail = []
+
+# Main loop
+dragging = False 
 running = True
-slider=False
 while running:
-    if slider:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-            # Mouse button press (start dragging)
+
+
+        # Handle mouse input for slider
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = event.pos
+            if (slider_handle_x <= mouse_x <= slider_handle_x + slider_handle_width and
+                slider_y <= mouse_y <= slider_y + slider_handle_height):
+                dragging = True
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
-                if (slider_handle_x <= mouse_x <= slider_handle_x + slider_handle_width and
-                    slider_y <= mouse_y <= slider_y + slider_handle_height):
-                    dragging = True
+                if button_rect.collidepoint(event.pos):  # Check if the button was clicked
+                    print("Button clicked!")
 
-            # Mouse button release (stop dragging)
-            elif event.type == pygame.MOUSEBUTTONUP:
-                dragging = False
+        if event.type == pygame.MOUSEBUTTONUP:
+            dragging = False
 
-        # If dragging, update the handle position based on mouse X position
-        if dragging:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            # Make sure the handle stays within the slider bounds
-            slider_handle_x = max(slider_x, min(mouse_x - slider_handle_width // 2, slider_x + slider_width - slider_handle_width))
+    # Update slider position if dragging
+    if dragging:
+        mouse_x, _ = pygame.mouse.get_pos()
+        slider_handle_x = max(slider_x, min(mouse_x - slider_handle_width // 2, slider_x + slider_width - slider_handle_width))
+        slider_value = (slider_handle_x - slider_x) / (slider_width - slider_handle_width)
 
-            # Update the slider value
-            slider_value = (slider_handle_x - slider_x) / (slider_width - slider_handle_width)
+    # Update physics
+    earth.apply_acceleration_due_to(sun)
+    earth.update_position()
 
-        # Clear the screen
-        screen.fill((30, 30, 30))  # Dark background color
+    # Update trail
+    earth_pos = earth.pygame_position()
+    trail.append(tuple(earth_pos))
+    if len(trail) > 1000:
+        trail.pop(0)
 
-        # Draw the slider background (the bar)
-        pygame.draw.rect(screen, (200, 200, 200), (slider_x, slider_y, slider_width, slider_height))
+    # Clear screen
+    screen.fill(BACKGROUND)
 
-        # Draw the slider handle (the draggable part)
-        pygame.draw.rect(screen, (255, 0, 0), (slider_handle_x, slider_y - (slider_handle_height - slider_height) // 2, slider_handle_width, slider_handle_height))
+    # Draw trail
+    if len(trail) > 1:
+        pygame.draw.lines(screen, (0, 255, 0), False, trail, 2)
 
-        # Draw the slider value (optional)
-        font = pygame.font.SysFont(None, 36)
-        text = font.render(f"Value: {slider_value:.2f}", True, (255, 255, 255))
-        screen.blit(text, (WIDTH // 2 - text.get_width() // 2, 100))
-        # Fill the screen with white
-    
-    if not slider:
-        earth_pos=earth.pygame_position()
+    # Draw sun and earth
+    pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
+    pygame.draw.circle(screen, earth.color, earth.pygame_position(), earth.radius)
 
-        
-        # Add current position to the trail
-        trail.append(tuple(earth_pos))  # Store position as a tuple
-        if len(trail) > 1000:  # Limit trail length for performance
-            trail.pop(0)
+    # Draw the slider background (the bar)
+    pygame.draw.rect(screen, (200, 200, 200), (slider_x, slider_y, slider_width, slider_height))
 
+    # Draw the slider handle (the draggable part)
+    pygame.draw.rect(screen, (255, 0, 0),
+                     (slider_handle_x, slider_y - (slider_handle_height - slider_height) // 2, slider_handle_width,
+                      slider_handle_height))
 
-        screen.fill(BACKGROUND)
+    # Draw slider value (optional)
+    font = pygame.font.SysFont(None, 36)
+    text = font.render(f"Value: {slider_value:.2f}", True, (255, 255, 255))
+    screen.blit(text, (WIDTH // 2 - text.get_width() // 2, slider_y - 50))
 
-        # Draw the trail
-        if len(trail) > 1:
-            pygame.draw.lines(screen, (0, 255, 0), False, trail, 2)
-
-
-        # Draw a sun
-        earth.update_position()
-        #sun.update_position()
-        #moon.update_position()
-        earth.apply_acceleration_due_to(sun)
-        #moon.apply_acceleration_due_to(earth)
-        #sun.apply_acceleration_due_to(earth)
-        
-    
-        
-
-        #pygame.draw.circle(screen, moon.color, moon.pygame_position(), moon.radius)
-        pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
-        pygame.draw.circle(screen, earth.color, earth_pos, earth.radius)
-
-
-   # Update the display
+    # Update display
     pygame.display.flip()
-    rafraichissement.tick(60)
+    clock.tick(60)
 
-# Quit Pygame
 pygame.quit()
