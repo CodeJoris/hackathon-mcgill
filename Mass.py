@@ -1,5 +1,5 @@
 import Vector as v
-from math import cos
+from math import *
 
 class Mass:
   def __init__(self, name, radius, mass, x_pos, y_pos, velocity, color):
