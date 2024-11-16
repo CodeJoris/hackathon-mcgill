@@ -1,5 +1,5 @@
 import numpy as np
-from math import arctan
+from math import atan
 class Vector:
   def __init__(self,x_coord,y_coord):
     self.vec = np.array([x_coord,y_coord])
@@ -14,7 +14,7 @@ class Vector:
     return self.vec
 
   def polar_angle(self):
-    return arctan(self.y_coord/self.x_coord) 
+    return atan(self.y_coord/self.x_coord) 
     
   def pixels_to_meters(self):
     return self.vec*(1.5*10**11/300)
