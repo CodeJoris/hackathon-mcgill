@@ -1,5 +1,6 @@
 import Vector as v
 from math import *
+import pygame
 
 class Mass:
   def __init__(self, name, radius, mass, x_pos, y_pos, velocity, color):
@@ -29,3 +30,16 @@ class Mass:
     norm_acceleration = -G*other.get_mass()/(distance**2)
     acceleration = v.Vector(norm_acceleration*cos(theta),norm_acceleration*sin(theta))
     return acceleration
+
+  def update_position(self):
+      self.position += self.velocity
+
+  def apply_force(self, force):
+      acceleration = force / self.mass
+      self.velocity += acceleration
+
+  def draw(self, screen):
+      center = (int(self.pos[0]), int(self.pos[1]))
+      center = (int(center[0]),int(center[1]))
+      pygame.draw.circle(screen, self.color, center, self.radius)
+  
