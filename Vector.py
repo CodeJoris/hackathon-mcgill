@@ -1,5 +1,5 @@
 import numpy as np
-
+from math import arctan
 class Vector:
   def __init__(self,x_coord,y_coord):
     self.vec = np.array([x_coord,y_coord])
@@ -12,3 +12,6 @@ class Vector:
   
   def unit_vector(self):
     return self.vec 
+  
+  def polar_angle(self):
+    return arctan(y_coord/x_coord)

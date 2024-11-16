@@ -3,9 +3,13 @@ import numpy as np
 import sys, pygame, time, os
 from pygame.locals import *
 from random import randint, choice
-
+import Mass as m
+import Vector as v
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,30)
-
+#Configuration
+DIMENSIONS = WIDTH, HEIGHT =(1000,1000)
+BACKGROUND = (0,0,0)
+CENTER=(DIMENSIONS[0]/2,DIMENSIONS[1]/2)
 
 VITESSE=10
 
@@ -15,12 +19,15 @@ rafraichissement = pygame.time.Clock()
 BACKGROUND = (0,0,0)
 
 ### Definition of our two masses using class Mass ###
-sun = Mass("Sun",6.957*10**8,1.989*10**30,WIDTH/2,HEIGHT/2,0,"Yellow")
-earth = Mass("Earth",6.378*10**6,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,np.array([0,1]),"Blue")
+sun = m.Mass("Sun",6.957*10**8,1.989*10**30,WIDTH/2,HEIGHT/2,0,"Yellow")
+earth = m.Mass("Earth",6.378*10**6,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,np.array([0,1]),"Blue")
 
 G=6.67*10**-11
-acceleration = G
+relative_position = v.Vector(earth.get_position()-sun.get_position()) #position vector between Sun and Earthin Pixels
 
+distance = relative_position.norm()#distance between Earth and Sun in pixels
+theta = relative_position.polar_angle()
+norm_acceleration = G*sun.get_mass()/(distance**2)
 
 
 running = True
