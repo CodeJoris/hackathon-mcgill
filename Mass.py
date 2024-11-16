@@ -11,7 +11,7 @@ def unit_vector(array):
   return array / norm(array)
 
 def polar_angle(array):
-  return atan((-array[1])/array[0]) 
+  return atan((array[1])/array[0]) 
   
 def pixels_to_meters(array):
   return array*(1.5*10**11/300)
@@ -38,15 +38,15 @@ class Mass:
   def acceleration_due_to(self,other):
     G=6.67*10**-11
     relative_pos = self.get_position() - other.get_position() #position vector between Sun and Earthin Pixels
+    direction = unit_vector(relative_pos)
+
     relative_pos_meters = pixels_to_meters(relative_pos)
     distance = norm(relative_pos_meters)#distance between Earth and Sun in pixels
     theta = polar_angle(relative_pos)
-    factor=1
-    if theta > pi/2:
-       factor=-1
+    
     norm_acceleration = -G*other.get_mass()/(distance**2)
-    acceleration = np.array([norm_acceleration*cos(theta),norm_acceleration*sin(theta)])
-    return acceleration * factor
+    acceleration = norm_acceleration * direction
+    return acceleration
 
   def update_position(self):
       self.pos += self.velocity
