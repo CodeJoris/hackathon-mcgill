@@ -15,7 +15,7 @@ sun = Mass("Sun",6.957*10**8,1.989*10**30,WIDTH/2,HEIGHT/2,0,"Yellow")
 earth = Mass("Earth",6.378*10**6,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,np.array([0,1]),"Blue")
 
 G=6.67*10**-11
-acceleration =
+acceleration = G
 
 
 
