@@ -26,14 +26,6 @@ BACKGROUND = (0,0,0)
 sun = m.Mass("Sun",6.957*10**8,1.989*10**30,WIDTH/2,HEIGHT/2,0,(255,255,255))
 earth = m.Mass("Earth",6.378*10**6,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,np.array([0,1]),(255,255,255))
 
-def acceleration_update():
-    relative_pos = v.Vector(earth.get_position()-sun.get_position()) #position vector between Sun and Earthin Pixels
-    relative_pos_meters = relative_pos.pixels_to_meters()
-    distance = relative_pos_meters.norm()#distance between Earth and Sun in pixels
-    theta = relative_pos.polar_angle()
-    norm_acceleration = -G*sun.get_mass()/(distance**2)
-    acceleration = v.Vector(norm_acceleration*cos(theta),norm_acceleration*sin(theta))
-    return acceleration
 
 running = True
 while running:
