@@ -43,8 +43,8 @@ while running:
     screen.fill(BACKGROUND)
 
     # Draw a sun
-    pygame.draw.circle(screen, sun.color, sun.pos, sun.radius)
-    pygame.draw.circle(screen, earth.color, earth.pos, earth.radius)
+    pygame.draw.circle(screen, sun.pygame_position(), sun.pos, sun.radius)
+    pygame.draw.circle(screen, earth.pygame_position(), earth.pos, earth.radius)
 
     # Update the display
     pygame.display.flip()

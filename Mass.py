@@ -12,3 +12,5 @@ class Mass:
     return self.pos
   def get_mass(self):
     return self.mass
+  def pygame_position(self):
+    return (self.pos[0],self.pos[1])
