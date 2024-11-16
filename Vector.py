@@ -11,4 +11,4 @@ class Vector:
      return norm
   
   def unit_vector(self):
-    return self.vec 
+    return self.vec / self.norm()
