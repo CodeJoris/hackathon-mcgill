@@ -26,7 +26,7 @@ slider_value = 0.5  # Initial slider value
 slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)
 
 # Button properties
-button_rect = pygame.rect(10,10,30,30)
+button_rect = pygame.Rect(10,10,30,30)
 button_text = "Add mass"
 
 # Create screen and clock
