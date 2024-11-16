@@ -28,7 +28,7 @@ earth = m.Mass("Earth",2*6.378,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,(0,-1),(0,0,
 moon = m.Mass("Moon",1*6.378,5.9722*10**22,(WIDTH/2)+350,HEIGHT/2,(0,-1),(0,0,255))
 
 
-
+trail = []
 running = True
 while running:
     for event in pygame.event.get():
@@ -39,13 +39,13 @@ while running:
     
     earth_pos=earth.pygame_position()
 
-    trail = []
+    
     # Add current position to the trail
-    trail.append(earth_pos)  # Store position as a tuple
-    if len(trail) > 100:  # Limit trail length for performance
+    trail.append(tuple(earth_pos))  # Store position as a tuple
+    if len(trail) > 1000:  # Limit trail length for performance
         trail.pop(0)
 
-    print(trail)
+    print(len(trail))
 
     screen.fill(BACKGROUND)
 
