@@ -8,7 +8,7 @@ class Mass:
     self.radius=radius
     self.mass=mass
     self.pos=v.Vector(x_pos,y_pos)
-    self.velocity=velocity
+    self.velocity=v.Vector(velocity[0],velocity[1])
     self.color=color
 
   def get_position(self):
@@ -32,7 +32,7 @@ class Mass:
     return acceleration
 
   def update_position(self):
-      self.position += self.velocity
+      self.pos += self.velocity
 
   def apply_force(self, force):
       acceleration = force / self.mass

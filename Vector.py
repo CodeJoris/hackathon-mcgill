@@ -6,6 +6,9 @@ class Vector:
     self.x_coord=x_coord
     self.y_coord=y_coord
 
+  def __add__(self,other):
+    return self.vec + other.vec
+
   def norm(self):
      norm=(self.x_coord**2+self.y_coord**2)**0.5
      return norm

@@ -37,6 +37,7 @@ while running:
     screen.fill(BACKGROUND)
 
     # Draw a sun
+    earth.update_position()
     pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
     pygame.draw.circle(screen, earth.color, earth.pygame_position(), earth.radius)
 
