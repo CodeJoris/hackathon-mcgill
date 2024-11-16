@@ -1,4 +1,8 @@
 ### Main Code ###
+import numpy as np
+import sys, pygame, time, os
+from pygame.locals import *
+from random import randint, choice
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,30)
 
