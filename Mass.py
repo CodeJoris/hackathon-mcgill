@@ -32,6 +32,9 @@ class Mass:
   def get_mass(self):
     return self.mass
   
+  def get_velocity(self):
+     return self.velocity
+  
   def pygame_position(self):
     return (self.pos[0],self.pos[1])
   

@@ -23,9 +23,9 @@ G=6.67*10**-11
 BACKGROUND = (0,0,0)
 pygame.init()
 ### Definition of our two masses using class Mass ###
-sun = m.Mass("Sun",6.957*10,1.989*10**30,WIDTH/2,HEIGHT/2,(0,0),(255,255,0))
-earth = m.Mass("Earth",2*6.378,5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,(0,-1),(0,0,255))
-moon = m.Mass("Moon",1*6.378,5.9722*10**22,(WIDTH/2)+350,HEIGHT/2,(0,-1),(0,0,255))
+sun = m.Mass("Sun",6.957*10, 1.989*10**30,WIDTH/2,HEIGHT/2,(0,0),(255,255,0))
+earth = m.Mass("Earth",1.4*6.378, 5.9722*10**24,(WIDTH/2)+300,HEIGHT/2,(0,-1),(0,0,255))
+moon = m.Mass("Moon",0.7*6.378, 5.9722*10**22,(WIDTH/2)+305,HEIGHT/2,(0,-1.1),(255,0,0))
 
 
 trail = []
@@ -45,7 +45,6 @@ while running:
     if len(trail) > 1000:  # Limit trail length for performance
         trail.pop(0)
 
-    print(len(trail))
 
     screen.fill(BACKGROUND)
 
@@ -56,8 +55,14 @@ while running:
 
     # Draw a sun
     earth.update_position()
+    moon.update_position()
     earth.apply_acceleration_due_to(sun)
+    moon.apply_acceleration_due_to(earth)
     
+  
+    
+
+    pygame.draw.circle(screen, moon.color, moon.pygame_position(), moon.radius)
     pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
     pygame.draw.circle(screen, earth.color, earth_pos, earth.radius)
 
