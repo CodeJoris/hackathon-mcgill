@@ -132,7 +132,6 @@ while running:
     if button_rect.collidepoint(pygame.mouse.get_pos()):
         mouse_hover = True
 
-
     # Update physics
     earth.apply_acceleration_due_to(sun)
     earth.update()
@@ -170,9 +169,16 @@ while running:
     text_rect = text_surface.get_rect(center=button_rect.center)
     screen.blit(text_surface, text_rect)
     
-    if pygame.sprite.collide_circle(earth, sun):
+    if (pygame.sprite.collide_circle(earth, sun)):
         earth.restart()
         slider_value = 0.5
+
+    for sprite in all_sprites:
+        if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.top > HEIGHT):
+            earth.restart()
+            slider_value = 0.5
+            break
+
     all_sprites.update()
 
     # Draw the slider if visible
