@@ -46,14 +46,51 @@ dragging = False        # Tracks if the slider handle is being dragged
 screen = pygame.display.set_mode(DIMENSIONS)
 clock = pygame.time.Clock()
 
+#Image
+sun_image = pygame.image.load('sun.png').convert_alpha()
+sun_size = (70,70)
+sun_image = pygame.transform.scale(sun_image,sun_size)
+sun_image.set_colorkey((255,255,255))
+
+sat_image = pygame.image.load('satellite.jpg').convert_alpha()
+sat_size = (50,50)
+sat_image = pygame.transform.scale(sat_image,sat_size)
+sat_image.set_colorkey((255,255,255))
+
+
 # Background color
 BACKGROUND = (30, 30, 30)
 
 # Create Masses
-sun = m.Mass("Sun", 6.957 * 10, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
-earth = m.Mass("Earth", 2 * 6.378, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -1), (0, 0, 255))
+sun = m.Mass("Sun", 35, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
+earth = m.Mass("Earth", 25, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -1), (0, 0, 255))
 
 trail = []
+trail_colors = []
+initial_norm = earth.norm_velocity()
+red_shift = 0
+blue_shift = 255
+TRAIL_COLOR = (red_shift,0,blue_shift)
+
+
+min_speed = 0
+max_speed = 5
+
+# Helper function to map speed to color
+def speed_to_color(speed, min_speed, max_speed):
+    """
+    Maps the speed to a color gradient (blue to red).
+    """
+    # Normalize speed to a 0-1 range
+    normalized_speed = max(0, min(1, (speed - min_speed) / (max_speed - min_speed)))
+    # Interpolate between blue (slow) and red (fast)
+    red = int(255 * normalized_speed)
+    blue = int(255 * (1 - normalized_speed))
+    return (red, 0, blue)
+
+# Add masses to group
+all_sprites = pygame.sprite.Group()
+all_sprites.add(sun, earth)
 
 # Main loop
 while running:
@@ -62,8 +99,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         mouse_hover = False
-        if event.type == pygame.QUIT:
-            running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:  # Up arrow key
+                earth.apply_custom_acceleration(np.array([0,-0.5]))
+            elif event.key == pygame.K_DOWN:  # Down arrow key
+                earth.apply_custom_acceleration(np.array([0,0.5]))
+            elif event.key == pygame.K_LEFT:  # Left arrow key
+                earth.apply_custom_acceleration(np.array([-0.5,0]))
+            elif event.key == pygame.K_RIGHT:  # Right arrow key
+                earth.apply_custom_acceleration(np.array([0.5,0]))
 
         # Mouse button press (start dragging)
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -90,24 +135,31 @@ while running:
 
     # Update physics
     earth.apply_acceleration_due_to(sun)
-    earth.update_position()
+    earth.update()
 
     # Update trail
+    speed = earth.norm_velocity()
     earth_pos = earth.pygame_position()
+    trail_colors.append(speed_to_color(speed, min_speed, max_speed))
     trail.append(tuple(earth_pos))
-    if len(trail) > 1000:
-        trail.pop(0)
+    #if len(trail) > 1000:
+        #trail.pop(0)
+
+    # Update suns mass based on the slider
+    sun_mass = 0.01*(slider_value*sun.get_mass()) + 0.995*(sun.get_mass()) # y = 0.2x + 0.9 (scaled by mass of the sun)
+    sun.set_mass(sun_mass)
 
     # Clear screen
     screen.fill(BACKGROUND)
 
     # Draw trail
     if len(trail) > 1:
-        pygame.draw.lines(screen, (0, 255, 0), False, trail, 2)
+        for i in range(1, len(trail)):
+            pygame.draw.line(screen, trail_colors[i], trail[i - 1], trail[i], 2)
 
     # Draw sun and earth
-    pygame.draw.circle(screen, sun.color, sun.pygame_position(), sun.radius)
-    pygame.draw.circle(screen, earth.color, earth.pygame_position(), earth.radius)
+    screen.blit(sun_image,(WIDTH//2 - sun_size[0]//2, HEIGHT//2 - sun_size[1]//2))
+    screen.blit(sat_image,(earth.get_position()[0] - sat_size[0]//2, earth.get_position()[1]  - sat_size[1]//2))
 
     # Draw the button
     button_color = HOVER_COLOR if mouse_hover else BUTTON_COLOR
@@ -117,6 +169,11 @@ while running:
     text_surface = FONT.render(button_text, True, TEXT_COLOR)
     text_rect = text_surface.get_rect(center=button_rect.center)
     screen.blit(text_surface, text_rect)
+    
+    if pygame.sprite.collide_circle(earth, sun):
+        earth.restart()
+        slider_value = 0.5
+    all_sprites.update()
 
     # Draw the slider if visible
     if slider_visible:
@@ -132,6 +189,6 @@ while running:
 
     # Update display
     pygame.display.flip()
-    clock.tick(100)
+    clock.tick(60)
 
 pygame.quit()
