@@ -96,13 +96,13 @@ lives_image.set_colorkey((255,255,255))
 
 
 # Win lose screens
-lose_image = pygame.image.load("defeat.png")
-lose_image = pygame.transform.scale(lose_image,(400,400))
-lose_image.set_colorkey((255,255,255))
+font = pygame.font.Font(None, 36)
+lose_text_surface = font.render('You Lose', True, (255,0,0))
+lose_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2))
 
-win_image = pygame.image.load("victory.jpg")
-win_image = pygame.transform.scale(win_image,(400,400))
-win_image.set_colorkey((255,255,255))
+win_text_surface = font.render('You WIN', True, (255,0,0))
+win_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2))
+
 
 
 
@@ -180,6 +180,7 @@ lose = False
 
 initialize_slider()
 while running:
+    
     if not win and not lose:
         # Event handling
         for event in pygame.event.get():
@@ -324,13 +325,17 @@ while running:
             screen.blit(slider_value_text, (WIDTH // 2 - slider_value_text.get_width() // 2, slider_y - 50))
 
     elif win:
-        screen.blit(win_image,(200,300))
-    
-    else:
         screen.fill(BACKGROUND_COLOR)
-        screen.blit(lose_image,(200,200))
+        screen.blit(win_text_surface,win_text)
+    
+    elif lose:
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(lose_text_surface,lose_text)
 
     # Update display
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
     pygame.display.flip()
     clock.tick(60)
 
