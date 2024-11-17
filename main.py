@@ -63,7 +63,7 @@ sat_image.set_colorkey((255,255,255))
 # Background color
 background_image = pygame.image.load("stars.jpg")
 background_image = pygame.transform.scale(background_image, (1000, 1000))
-#BACKGROUND = (30, 30, 30)
+background_image.set_alpha(46)
 
 # Create Masses
 sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
@@ -100,22 +100,30 @@ box_width, box_height = 300, 40
 fill_width=(fuel_level/max_fuel)*box_width
 
 # Progress bar
-font = pygame.font.Font(None, 36)
-tag_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
-text_surface = font.render(tag_text, True, (255,0,0))
-text_rect = text_surface.get_rect(center=(box_x + box_width // 2, box_y - 20))  # Position above the box
-
 progress=0
 max_progress=100
-progress_box_x, progress_box_y = WIDTH//2, HEIGHT-50
-progress_box_width, progress_box_height = 300, 40
-progress_fill_width=(progress/max_progress)*progress_box_width
+fuel_box_x, fuel_box_y = WIDTH//2, HEIGHT-50
+fuel_box_width, fuel_box_height = 300, 40
+fuel_fill_width=(progress/max_progress)*fuel_box_width
+
+#fuel text
+font = pygame.font.Font(None, 36)
+fuel_tag_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
+fuel_text_surface = font.render(fuel_tag_text, True, (255,0,0))
+fuel_text = fuel_text_surface.get_rect(center=(fuel_box_x + fuel_box_width // 2, fuel_box_y - 20))  # Position above the box
+
+#progress text
+font = pygame.font.Font(None, 36)
+progress_tag_text = f"Progress : {int(progress)} / {max_progress}"
+progress_text_surface = font.render(progress_tag_text, True, (255,0,0))
+progress_text = progress_text_surface.get_rect(center=(box_x + box_width // 2, box_y - 20))  # Position above the box
 
 
 
 # Add masses to group
 all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
+
 def restart():
     global slider_value, fuel_level, fill_width, lives
     time.sleep(3)
@@ -126,7 +134,6 @@ def restart():
     trail_colors.clear()
     fill_width = (fuel_level / max_fuel) * box_width
     lives -= 1
-
 
 # Main loop
 while running:
@@ -192,7 +199,7 @@ while running:
     sun.set_mass(sun_mass)
 
     # Clear screen
-    screen.fill((0, 0, 0))
+    screen.blit(background_image,(0,0))
 
     # Draw trail
     if len(trail) > 1:
@@ -213,29 +220,40 @@ while running:
     screen.blit(text_surface, text_rect)
     
     if (pygame.sprite.collide_circle(earth, sun)):
-        if (lives > 0):
+        if (lives > 1):
             restart()
         else:
             running = False
 
     for sprite in all_sprites:
         if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
-            if (lives > 0):
+            if (lives > 1):
                 restart()
             else:
                 running = False
 
     # velocity earth
-    if earth.norm_velocity() > 1.5:
+    if earth.norm_velocity() > 2:
         progress += 0.026
-    progress_fill_width=(progress/max_progress)*progress_box_width
+    fuel_fill_width=(progress/max_progress)*fuel_box_width
 
     all_sprites.update()
 
-    #draw progress box
-    screen.blit(text_surface, text_rect)
-    pygame.draw.rect(screen, (90, 102, 92), (progress_box_x, progress_box_y, progress_box_width, progress_box_height), 2)
-    pygame.draw.rect(screen, (222, 173, 45), (progress_box_x, progress_box_y, progress_fill_width, progress_box_height))
+    #draw fuel text
+    fuel_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
+    fuel_text_surface = font.render(fuel_text, True, (255,0,0))
+    fuel_text_pos = (box_x, box_y - 40)
+    screen.blit(fuel_text_surface, fuel_text_pos)
+
+    #draw progress text
+    progress_text = f"Progress Level : {int(progress)} / {max_progress}"
+    progress_text_surface = font.render(progress_text, True, (255,255,0))
+    progress_text_pos = (fuel_box_x, fuel_box_y - 40)
+    screen.blit(progress_text_surface, progress_text_pos)
+
+    #draw fuel rectable
+    pygame.draw.rect(screen, (90, 102, 92), (fuel_box_x, fuel_box_y, fuel_box_width, fuel_box_height), 2)
+    pygame.draw.rect(screen, (222, 173, 45), (fuel_box_x, fuel_box_y, fuel_fill_width, fuel_box_height))
         
     #draw rectangles fuel box
     pygame.draw.rect(screen, (200,200,200), (box_x, box_y, box_width, box_height), 2)
