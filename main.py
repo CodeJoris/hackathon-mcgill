@@ -108,16 +108,20 @@ while running:
         mouse_hover = False
 
         if event.type == pygame.KEYDOWN:
-            fuel_level-=1
+            
             fill_width=(fuel_level/max_fuel)*box_width
             if fuel_level>0:
                 if event.key == pygame.K_UP:  # Up arrow key
+                    fuel_level-=1
                     earth.apply_custom_acceleration(np.array([0,-0.5]))
                 elif event.key == pygame.K_DOWN:  # Down arrow key
+                    fuel_level-=1
                     earth.apply_custom_acceleration(np.array([0,0.5]))
                 elif event.key == pygame.K_LEFT:  # Left arrow key
+                    fuel_level-=1
                     earth.apply_custom_acceleration(np.array([-0.5,0]))
                 elif event.key == pygame.K_RIGHT:  # Right arrow key
+                    fuel_level-=1
                     earth.apply_custom_acceleration(np.array([0.5,0]))
 
         # Mouse button press (start dragging)
