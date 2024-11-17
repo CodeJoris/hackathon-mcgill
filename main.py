@@ -88,6 +88,13 @@ def speed_to_color(speed, min_speed, max_speed):
     blue = int(255 * (1 - normalized_speed))
     return (red, 0, blue)
 
+# Fuel level rectangles
+fuel_level = 100
+max_fuel = 100
+box_x, box_y = 10, HEIGHT-50
+box_width, box_height = 300, 40
+fill_width=(fuel_level/max_fuel)*box_width
+
 # Add masses to group
 all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
@@ -101,14 +108,21 @@ while running:
         mouse_hover = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:  # Up arrow key
-                earth.apply_custom_acceleration(np.array([0,-0.5]))
-            elif event.key == pygame.K_DOWN:  # Down arrow key
-                earth.apply_custom_acceleration(np.array([0,0.5]))
-            elif event.key == pygame.K_LEFT:  # Left arrow key
-                earth.apply_custom_acceleration(np.array([-0.5,0]))
-            elif event.key == pygame.K_RIGHT:  # Right arrow key
-                earth.apply_custom_acceleration(np.array([0.5,0]))
+            
+            fill_width=(fuel_level/max_fuel)*box_width
+            if fuel_level>0:
+                if event.key == pygame.K_UP:  # Up arrow key
+                    fuel_level-=1
+                    earth.apply_custom_acceleration(np.array([0,-0.5]))
+                elif event.key == pygame.K_DOWN:  # Down arrow key
+                    fuel_level-=1
+                    earth.apply_custom_acceleration(np.array([0,0.5]))
+                elif event.key == pygame.K_LEFT:  # Left arrow key
+                    fuel_level-=1
+                    earth.apply_custom_acceleration(np.array([-0.5,0]))
+                elif event.key == pygame.K_RIGHT:  # Right arrow key
+                    fuel_level-=1
+                    earth.apply_custom_acceleration(np.array([0.5,0]))
 
         # Mouse button press (start dragging)
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -180,6 +194,10 @@ while running:
             break
 
     all_sprites.update()
+
+    #draw rectangles fuel box
+    pygame.draw.rect(screen, (200,200,200), (box_x, box_y, box_width, box_height), 2)
+    pygame.draw.rect(screen, (215,43,43), (box_x, box_y, fill_width, box_height))
 
     # Draw the slider if visible
     if slider_visible:
