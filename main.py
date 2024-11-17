@@ -28,12 +28,12 @@ button_rect = pygame.Rect(10, 10, 80, 50)  # x, y, width, height
 button_text = "Change Mass"
 
 # Slider properties
-slider_x = 100  # Starting X position of the slider
-slider_y = 30  # Y position of the slider
-slider_width = 300  # Width of the slider bar
-slider_height = 10  # Height of the slider bar
-slider_handle_width = 20  # Width of the slider handle
-slider_handle_height = 20  # Height of the slider handle
+slider_x = 100  
+slider_y = 30  
+slider_width = 300  
+slider_height = 10  
+slider_handle_width = 20  
+slider_handle_height = 20  
 
 # Helper function to map speed to color
 def speed_to_color(speed, min_speed, max_speed):
@@ -78,21 +78,20 @@ def velocity_vector():
     velocity = earth.get_velocity() 
 
     # Scale the velocity vector for visibility
-    scale = 50  # Adjust as needed
+    scale = 50  
     scaled_velocity = velocity * scale
 
     end_position = position + scaled_velocity
 
     # Draw the velocity vector
     pygame.draw.line(screen, (250, 0, 0), position, end_position, width=2)  # Red line for velocity
-    pygame.draw.circle(screen, (0, 255, 0), position.astype(int), 4)  # Small green circle at Earth's position
 
 
 # Create screen and clock
 screen = pygame.display.set_mode(DIMENSIONS)
 clock = pygame.time.Clock()
 
-#Image fo the sun
+#Image for the sun
 sun_image = pygame.image.load('sun.png').convert_alpha()
 sun_size = (70,70)
 sun_image = pygame.transform.scale(sun_image,sun_size)
@@ -123,15 +122,12 @@ win_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2 -100))
 
 
 # Create Masses
-sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
-earth = m.Mass("Earth", 25, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -1), (0, 0, 255))
+sun = m.Mass("Sol", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
+earth = m.Mass("Satellite", 25, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -1), (0, 0, 255))
 
 trail = []
 trail_colors = []
-initial_norm = earth.norm_velocity()
-red_shift = 0
-blue_shift = 255
-TRAIL_COLOR = (red_shift,0,blue_shift)
+
 
 lives = 3
 min_speed = 0
@@ -269,14 +265,14 @@ while running:
         text_rect = text_surface.get_rect(center=button_rect.center)
         screen.blit(text_surface, text_rect)
         
-        # check for collision with the sun
+        # Check for collision with the sun
         if (pygame.sprite.collide_circle(earth, sun)):
             if (lives > 1):
                 restart()
             else:
                 lose = True
 
-        # check for collision with the border
+        # Check for collision with the border
         for sprite in all_sprites:
             if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
                 if (lives > 1):
@@ -284,9 +280,9 @@ while running:
                 else:
                     lose = True
 
-        # velocity earth
+        # Velocity Earth
         if earth.norm_velocity() > 3:
-            progress += 0.26
+            progress += 0.26 # because this is a nice amt to increment by
         fuel_fill_width=(progress/max_progress)*fuel_box_width
 
         all_sprites.update()
