@@ -76,7 +76,7 @@ red_shift = 0
 blue_shift = 255
 TRAIL_COLOR = (red_shift,0,blue_shift)
 
-
+lives = 3
 min_speed = 0
 max_speed = 5
 
@@ -90,7 +90,7 @@ def speed_to_color(speed, min_speed, max_speed):
     # Interpolate between blue (slow) and red (fast)
     red = int(255 * normalized_speed)
     blue = int(255 * (1 - normalized_speed))
-    return (red, 0, blue)
+    return red, 0, blue
 
 # Fuel level rectangles
 fuel_level = 100
@@ -122,6 +122,17 @@ progress_text = progress_text_surface.get_rect(center=(box_x + box_width // 2, b
 # Add masses to group
 all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
+def restart():
+    global slider_value, fuel_level, fill_width, lives
+    time.sleep(3)
+    earth.restart()
+    slider_value = 0.0
+    fuel_level = 100
+    trail.clear()
+    trail_colors.clear()
+    fill_width = (fuel_level / max_fuel) * box_width
+    lives -= 1
+
 
 # Main loop
 while running:
@@ -187,7 +198,7 @@ while running:
     sun.set_mass(sun_mass)
 
     # Clear screen
-    screen.blit(background_image,(0,0))
+    screen.fill(BACKGROUND)
 
     # Draw trail
     if len(trail) > 1:
@@ -208,25 +219,17 @@ while running:
     screen.blit(text_surface, text_rect)
     
     if (pygame.sprite.collide_circle(earth, sun)):
-        time.sleep(3)
-        earth.restart()
-        slider_value = 0.5
-        fuel_level = 100
-        trail.clear()
-        trail_colors.clear()
-
-        fill_width = (fuel_level / max_fuel) * box_width
+        if (lives > 0):
+            restart()
+        else:
+            running = False
 
     for sprite in all_sprites:
         if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
-            time.sleep(3)
-            earth.restart()
-            slider_value = 0.5
-            fuel_level = 100
-            fill_width = (fuel_level / max_fuel) * box_width
-            trail.clear()
-            trail_colors.clear()
-            break
+            if (lives > 0):
+                restart()
+            else:
+                running = False
 
     # velocity earth
     if earth.norm_velocity() > 2:
