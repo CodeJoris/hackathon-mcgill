@@ -21,39 +21,45 @@ HOVER_COLOR = (100, 160, 210)
 TEXT_COLOR = (255, 255, 255)
 
 # Fonts
-FONT = pygame.font.Font(None, 12)
+FONT = pygame.font.Font(None, 16)
 
 # Button properties
-button_rect = pygame.Rect(10, 10, 50, 50)  # x, y, width, height
-button_text = "Add Mass"
+button_rect = pygame.Rect(10, 10, 80, 50)  # x, y, width, height
+button_text = "Change Mass"
 
 # Slider properties
-slider_x = 20  # Starting X position of the slider
-slider_y = 15  # Y position of the slider
-slider_width = 600  # Width of the slider bar
+slider_x = 100  # Starting X position of the slider
+slider_y = 30  # Y position of the slider
+slider_width = 300  # Width of the slider bar
 slider_height = 10  # Height of the slider bar
 slider_handle_width = 20  # Width of the slider handle
 slider_handle_height = 20  # Height of the slider handle
 
-# Initial slider value (percentage)
-slider_value = 0.0  # Value between 0 and 1 (50%)
-slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)  # Initial handle position
+def initialize_slider():
+    global slider_visible, dragging, slider_handle_x, slider_value
+    
+
+    slider_value = 0.0
+    slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)  # Initial handle position
+
+    slider_visible = False  # Controls whether the slider is visible
+    dragging = False        # Tracks if the slider handle is being dragged
 
 # Variables
 running = True
-slider_visible = False  # Controls whether the slider is visible
-dragging = False        # Tracks if the slider handle is being dragged
+
 
 # Create screen and clock
 screen = pygame.display.set_mode(DIMENSIONS)
 clock = pygame.time.Clock()
 
-#Image
+#Image fo the sun
 sun_image = pygame.image.load('sun.png').convert_alpha()
 sun_size = (70,70)
 sun_image = pygame.transform.scale(sun_image,sun_size)
 sun_image.set_colorkey((255,255,255))
 
+#Image of the Satellite
 sat_image = pygame.image.load('satellite.jpg').convert_alpha()
 sat_size = (50,50)
 sat_image = pygame.transform.scale(sat_image,sat_size)
@@ -63,7 +69,6 @@ sat_image.set_colorkey((255,255,255))
 # Background color
 background_image = pygame.image.load("stars.jpg")
 background_image = pygame.transform.scale(background_image, (1000, 1000))
-background_image.set_alpha(46)
 
 # Create Masses
 sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
@@ -119,13 +124,16 @@ progress_text_surface = font.render(progress_tag_text, True, (255,0,0))
 progress_text = progress_text_surface.get_rect(center=(box_x + box_width // 2, box_y - 20))  # Position above the box
 
 
+
 # Add masses to group
 all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
+
 def restart():
     global slider_value, fuel_level, fill_width, lives
     time.sleep(3)
     earth.restart()
+    initialize_slider()
     slider_value = 0.0
     fuel_level = 100
     trail.clear()
@@ -133,8 +141,8 @@ def restart():
     fill_width = (fuel_level / max_fuel) * box_width
     lives -= 1
 
-
 # Main loop
+initialize_slider()
 while running:
     screen.blit(background_image, (0, 0))
     # Event handling
@@ -219,14 +227,14 @@ while running:
     screen.blit(text_surface, text_rect)
     
     if (pygame.sprite.collide_circle(earth, sun)):
-        if (lives > 0):
+        if (lives > 1):
             restart()
         else:
             running = False
 
     for sprite in all_sprites:
         if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
-            if (lives > 0):
+            if (lives > 1):
                 restart()
             else:
                 running = False
