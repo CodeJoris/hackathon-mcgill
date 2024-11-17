@@ -26,7 +26,6 @@ class Mass(pygame.sprite.Sprite):
     self.velocity = np.array([velocity[0], velocity[1]], dtype=np.float64)
     self.color = color
     self.originalData = (radius, mass, self.pos.copy(), self.velocity.copy())
-    # Create the image surface for the sprite (circle)
     self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
     pygame.draw.circle(self.image, self.color, (self.radius, self.radius), self.radius)
 
@@ -72,6 +71,9 @@ class Mass(pygame.sprite.Sprite):
     self.rect.center = self.pygame_position()
 
   def acceleration_due_to(self,other):
+    ''' (Mass, Mass) -> np.array
+    
+    all the physics of the project is here tbh'''
     G=6.67*10**-11
     relative_pos = self.get_position() - other.get_position() #position vector between Sun and Earthin Pixels
     direction = unit_vector(relative_pos)
@@ -84,18 +86,11 @@ class Mass(pygame.sprite.Sprite):
     acceleration = norm_acceleration * direction
     return acceleration
 
-#  def update_position(self):
-#      self.pos += self.velocity
 
   def apply_acceleration_due_to(self,other):
+      '''name says it all'''
       self.velocity += self.acceleration_due_to(other)
 
   def draw(self, screen):
     '''Draw the circle to the screen (handled by sprite's image and rect)'''
     screen.blit(self.image, self.rect)
-
-
-#   def draw(self, screen):
-#      center = (int(self.pos[0]), int(self.pos[1]))
-#      center = (int(center[0]),int(center[1]))
-#      pygame.draw.circle(screen, self.color, center, self.radius)

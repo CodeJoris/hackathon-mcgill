@@ -65,6 +65,11 @@ sat_size = (50,50)
 sat_image = pygame.transform.scale(sat_image,sat_size)
 sat_image.set_colorkey((255,255,255))
 
+#IMage heart
+lives_image = pygame.image.load('heart.jpg').convert_alpha()
+lives_size = (50,50)
+lives_image = pygame.transform.scale(lives_image,lives_size)
+lives_image.set_colorkey((255,255,255))
 
 # Background color
 background_image = pygame.image.load("stars.jpg")
@@ -130,7 +135,8 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
 
 def restart():
-    global slider_value, fuel_level, fill_width, lives
+    global slider_value, fuel_level, fill_width, lives, progress
+    progress=0
     time.sleep(3)
     earth.restart()
     initialize_slider()
@@ -140,6 +146,7 @@ def restart():
     trail_colors.clear()
     fill_width = (fuel_level / max_fuel) * box_width
     lives -= 1
+    
 
 # Main loop
 initialize_slider()
@@ -205,6 +212,10 @@ while running:
     sun_mass = 3*(slider_value*sun.originalData[1]) + 1*(sun.originalData[1]) # y = 0.2x + 0.9 (scaled by mass of the sun)
     sun.set_mass(sun_mass)
 
+    # Win condition
+    if progress >= 100:
+        win_screen = True
+
     # Clear screen
     screen.blit(background_image,(0,0))
 
@@ -240,8 +251,8 @@ while running:
                 running = False
 
     # velocity earth
-    if earth.norm_velocity() > 2:
-        progress += 0.026
+    if earth.norm_velocity() > 3:
+        progress += 0.26
     fuel_fill_width=(progress/max_progress)*fuel_box_width
 
     all_sprites.update()
@@ -251,6 +262,10 @@ while running:
     fuel_text_surface = font.render(fuel_text, True, (255,0,0))
     fuel_text_pos = (box_x, box_y - 40)
     screen.blit(fuel_text_surface, fuel_text_pos)
+
+    #Draw hearts
+    for i in range(lives):
+        screen.blit(lives_image,(940-60*i,20))
 
     #draw progress text
     progress_text = f"Progress Level : {int(progress)} / {max_progress}"
