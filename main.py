@@ -35,6 +35,19 @@ slider_height = 10  # Height of the slider bar
 slider_handle_width = 20  # Width of the slider handle
 slider_handle_height = 20  # Height of the slider handle
 
+# Helper function to map speed to color
+def speed_to_color(speed, min_speed, max_speed):
+    """
+    Maps the speed to a color gradient (blue to red).
+    """
+    # Normalize speed to a 0-1 range
+    normalized_speed = max(0, min(1, (speed - min_speed) / (max_speed - min_speed)))
+    # Interpolate between blue (slow) and red (fast)
+    red = int(255 * normalized_speed)
+    blue = int(255 * (1 - normalized_speed))
+    return red, 0, blue
+
+# Helper function to reset the slider when you hit something
 def initialize_slider():
     global slider_visible, dragging, slider_handle_x, slider_value
     
@@ -45,8 +58,18 @@ def initialize_slider():
     slider_visible = False  # Controls whether the slider is visible
     dragging = False        # Tracks if the slider handle is being dragged
 
-# Variables
-running = True
+def restart():
+    global slider_value, fuel_level, fill_width, lives, progress
+    progress=0
+    time.sleep(3)
+    earth.restart()
+    initialize_slider()
+    slider_value = 0.0
+    fuel_level = 100
+    trail.clear()
+    trail_colors.clear()
+    fill_width = (fuel_level / max_fuel) * box_width
+    lives -= 1
 
 
 # Create screen and clock
@@ -71,9 +94,17 @@ lives_size = (50,50)
 lives_image = pygame.transform.scale(lives_image,lives_size)
 lives_image.set_colorkey((255,255,255))
 
-# Background color
-background_image = pygame.image.load("stars.jpg")
-background_image = pygame.transform.scale(background_image, (1000, 1000))
+
+# Win lose screens
+lose_image = pygame.image.load("defeat.png")
+lose_image = pygame.transform.scale(lose_image,(400,400))
+lose_image.set_colorkey((255,255,255))
+
+win_image = pygame.image.load("victory.jpg")
+win_image = pygame.transform.scale(win_image,(400,400))
+win_image.set_colorkey((255,255,255))
+
+
 
 # Create Masses
 sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
@@ -90,17 +121,7 @@ lives = 3
 min_speed = 0
 max_speed = 5
 
-# Helper function to map speed to color
-def speed_to_color(speed, min_speed, max_speed):
-    """
-    Maps the speed to a color gradient (blue to red).
-    """
-    # Normalize speed to a 0-1 range
-    normalized_speed = max(0, min(1, (speed - min_speed) / (max_speed - min_speed)))
-    # Interpolate between blue (slow) and red (fast)
-    red = int(255 * normalized_speed)
-    blue = int(255 * (1 - normalized_speed))
-    return red, 0, blue
+
 
 # Fuel level rectangles
 fuel_level = 100
@@ -134,164 +155,181 @@ progress_text = progress_text_surface.get_rect(center=(box_x + box_width // 2, b
 all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
 
-def restart():
-    global slider_value, fuel_level, fill_width, lives, progress
-    progress=0
-    time.sleep(3)
-    earth.restart()
-    initialize_slider()
-    slider_value = 0.0
-    fuel_level = 100
-    trail.clear()
-    trail_colors.clear()
-    fill_width = (fuel_level / max_fuel) * box_width
-    lives -= 1
+
+def velocity_vector():
+    position = earth.get_position()
+    velocity = earth.get_velocity() 
+
+    # Scale the velocity vector for visibility
+    scale = 50  # Adjust as needed
+    scaled_velocity = velocity * scale
+
+    end_position = position + scaled_velocity
+
+    # Draw the velocity vector
+    pygame.draw.line(screen, (250, 0, 0), position, end_position, width=2)  # Red line for velocity
+    pygame.draw.circle(screen, (0, 255, 0), position.astype(int), 4)  # Small green circle at Earth's position
+
     
+# Variables
+running = True
+win = False
+lose = False
 
 # Main loop
+
 initialize_slider()
 while running:
-    screen.blit(background_image, (0, 0))
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        mouse_hover = False
+    if not win and not lose:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-        if event.type == pygame.KEYDOWN:
-            
-            fill_width=(fuel_level/max_fuel)*box_width
-            if fuel_level>0:
-                if event.key == pygame.K_UP:  # Up arrow key
-                    fuel_level-=1
-                    earth.apply_custom_acceleration(np.array([0,-0.5]))
-                elif event.key == pygame.K_DOWN:  # Down arrow key
-                    fuel_level-=1
-                    earth.apply_custom_acceleration(np.array([0,0.5]))
-                elif event.key == pygame.K_LEFT:  # Left arrow key
-                    fuel_level-=1
-                    earth.apply_custom_acceleration(np.array([-0.5,0]))
-                elif event.key == pygame.K_RIGHT:  # Right arrow key
-                    fuel_level-=1
-                    earth.apply_custom_acceleration(np.array([0.5,0]))
+            if event.type == pygame.KEYDOWN:
+                
+                fill_width=(fuel_level/max_fuel)*box_width
+                if fuel_level>0:
+                    if event.key == pygame.K_UP:  # Up arrow key
+                        fuel_level-=1
+                        earth.apply_custom_acceleration(np.array([0,-0.5]))
+                    elif event.key == pygame.K_DOWN:  # Down arrow key
+                        fuel_level-=1
+                        earth.apply_custom_acceleration(np.array([0,0.5]))
+                    elif event.key == pygame.K_LEFT:  # Left arrow key
+                        fuel_level-=1
+                        earth.apply_custom_acceleration(np.array([-0.5,0]))
+                    elif event.key == pygame.K_RIGHT:  # Right arrow key
+                        fuel_level-=1
+                        earth.apply_custom_acceleration(np.array([0.5,0]))
 
-        # Mouse button press (start dragging)
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            if slider_visible and slider_handle_x <= mouse_x <= slider_handle_x + slider_handle_width and slider_y <= mouse_y <= slider_y + slider_handle_height:
-                dragging = True
-            elif button_rect.collidepoint(event.pos):  # Check if the button was clicked
-                slider_visible = not slider_visible  # Toggle slider visibility
+            # Mouse button press (start dragging)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if slider_visible and slider_handle_x <= mouse_x <= slider_handle_x + slider_handle_width and slider_y <= mouse_y <= slider_y + slider_handle_height:
+                    dragging = True
+                elif button_rect.collidepoint(event.pos):  # Check if the button was clicked
+                    slider_visible = not slider_visible  # Toggle slider visibility
 
-        # Mouse button release (stop dragging)
-        elif event.type == pygame.MOUSEBUTTONUP:
-            dragging = False
+            # Mouse button release (stop dragging)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                dragging = False
 
-    # If dragging, update the slider handle position and value
-    if dragging:
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        slider_handle_x = max(slider_x, min(mouse_x - slider_handle_width // 2, slider_x + slider_width - slider_handle_width))
-        slider_value = (slider_handle_x - slider_x) / (slider_width - slider_handle_width)
+        # If dragging, update the slider handle position and value
+        if dragging:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            slider_handle_x = max(slider_x, min(mouse_x - slider_handle_width // 2, slider_x + slider_width - slider_handle_width))
+            slider_value = (slider_handle_x - slider_x) / (slider_width - slider_handle_width)
 
-    # Detect mouse hover over the button
-    if button_rect.collidepoint(pygame.mouse.get_pos()):
-        mouse_hover = True
 
-    # Update physics
-    earth.apply_acceleration_due_to(sun)
-    earth.update()
 
-    # Update trail
-    speed = earth.norm_velocity()
-    earth_pos = earth.pygame_position()
-    trail_colors.append(speed_to_color(speed, min_speed, max_speed))
-    trail.append(tuple(earth_pos))
-    #if len(trail) > 1000:
-        #trail.pop(0)
-    # Update suns mass based on the slider
-    sun_mass = 3*(slider_value*sun.originalData[1]) + 1*(sun.originalData[1]) # y = 0.2x + 0.9 (scaled by mass of the sun)
-    sun.set_mass(sun_mass)
+        # Update physics
+        earth.apply_acceleration_due_to(sun)
+        earth.update()
 
-    # Win condition
-    if progress >= 100:
-        win_screen = True
+        # Update trail
+        speed = earth.norm_velocity()
+        earth_pos = earth.pygame_position()
+        trail_colors.append(speed_to_color(speed, min_speed, max_speed))
+        trail.append(tuple(earth_pos))
 
-    # Clear screen
-    screen.blit(background_image,(0,0))
+        # Update suns mass based on the slider
+        sun_mass = 3*(slider_value*sun.originalData[1]) + 1*(sun.originalData[1]) # y = 0.2x + 0.9 (scaled by mass of the sun)
+        sun.set_mass(sun_mass)
 
-    # Draw trail
-    if len(trail) > 1:
-        for i in range(1, len(trail)):
-            pygame.draw.line(screen, trail_colors[i], trail[i - 1], trail[i], 2)
+        # Win condition
+        if progress >= 100:
+            win = True
 
-    # Draw sun and earth
-    screen.blit(sun_image,(WIDTH//2 - sun_size[0]//2, HEIGHT//2 - sun_size[1]//2))
-    screen.blit(sat_image,(earth.get_position()[0] - sat_size[0]//2, earth.get_position()[1]  - sat_size[1]//2))
+        # Clear screen
+        screen.fill(BACKGROUND_COLOR)
 
-    # Draw the button
-    button_color = HOVER_COLOR if mouse_hover else BUTTON_COLOR
-    pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
+        #draw velocity vector
+        velocity_vector()
 
-    # Render the button text
-    text_surface = FONT.render(button_text, True, TEXT_COLOR)
-    text_rect = text_surface.get_rect(center=button_rect.center)
-    screen.blit(text_surface, text_rect)
-    
-    if (pygame.sprite.collide_circle(earth, sun)):
-        if (lives > 1):
-            restart()
-        else:
-            running = False
+        # Draw trail
+        if len(trail) > 1:
+            for i in range(1, len(trail)):
+                pygame.draw.line(screen, trail_colors[i], trail[i - 1], trail[i], 2)
 
-    for sprite in all_sprites:
-        if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
+        # Draw sun and earth
+        screen.blit(sun_image,(WIDTH//2 - sun_size[0]//2, HEIGHT//2 - sun_size[1]//2))
+        screen.blit(sat_image,(earth.get_position()[0] - sat_size[0]//2, earth.get_position()[1]  - sat_size[1]//2))
+
+        # Draw the button
+        button_color = BUTTON_COLOR
+        pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
+
+        # Render the button text
+        text_surface = FONT.render(button_text, True, TEXT_COLOR)
+        text_rect = text_surface.get_rect(center=button_rect.center)
+        screen.blit(text_surface, text_rect)
+        
+        # check for collision with the sun
+        if (pygame.sprite.collide_circle(earth, sun)):
             if (lives > 1):
                 restart()
             else:
-                running = False
+                lose = True
 
-    # velocity earth
-    if earth.norm_velocity() > 3:
-        progress += 0.26
-    fuel_fill_width=(progress/max_progress)*fuel_box_width
+        # check for collision with the border
+        for sprite in all_sprites:
+            if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
+                if (lives > 1):
+                    restart()
+                else:
+                    lose = True
 
-    all_sprites.update()
+        # velocity earth
+        if earth.norm_velocity() > 3:
+            progress += 0.26
+        fuel_fill_width=(progress/max_progress)*fuel_box_width
 
-    #draw fuel text
-    fuel_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
-    fuel_text_surface = font.render(fuel_text, True, (255,0,0))
-    fuel_text_pos = (box_x, box_y - 40)
-    screen.blit(fuel_text_surface, fuel_text_pos)
+        all_sprites.update()
 
-    #Draw hearts
-    for i in range(lives):
-        screen.blit(lives_image,(940-60*i,20))
+        #draw fuel text
+        fuel_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
+        fuel_text_surface = font.render(fuel_text, True, (255,0,0))
+        fuel_text_pos = (box_x, box_y - 40)
+        screen.blit(fuel_text_surface, fuel_text_pos)
 
-    #draw progress text
-    progress_text = f"Progress Level : {int(progress)} / {max_progress}"
-    progress_text_surface = font.render(progress_text, True, (255,255,0))
-    progress_text_pos = (fuel_box_x, fuel_box_y - 40)
-    screen.blit(progress_text_surface, progress_text_pos)
+        #Draw hearts
+        for i in range(lives):
+            screen.blit(lives_image,(940-60*i,20))
 
-    #draw fuel rectable
-    pygame.draw.rect(screen, (90, 102, 92), (fuel_box_x, fuel_box_y, fuel_box_width, fuel_box_height), 2)
-    pygame.draw.rect(screen, (222, 173, 45), (fuel_box_x, fuel_box_y, fuel_fill_width, fuel_box_height))
-        
-    #draw rectangles fuel box
-    pygame.draw.rect(screen, (200,200,200), (box_x, box_y, box_width, box_height), 2)
-    pygame.draw.rect(screen, (215,43,43), (box_x, box_y, fill_width, box_height))
+        #draw progress text
+        progress_text = f"Progress Level : {int(progress)} / {max_progress}"
+        progress_text_surface = font.render(progress_text, True, (255,255,0))
+        progress_text_pos = (fuel_box_x, fuel_box_y - 40)
+        screen.blit(progress_text_surface, progress_text_pos)
 
-    # Draw the slider if visible
-    if slider_visible:
-        # Draw the slider background (the bar)
-        pygame.draw.rect(screen, (200, 200, 200), (slider_x, slider_y, slider_width, slider_height))
+        #draw fuel rectable
+        pygame.draw.rect(screen, (90, 102, 92), (fuel_box_x, fuel_box_y, fuel_box_width, fuel_box_height), 2)
+        pygame.draw.rect(screen, (222, 173, 45), (fuel_box_x, fuel_box_y, fuel_fill_width, fuel_box_height))
+            
+        #draw rectangles fuel box
+        pygame.draw.rect(screen, (200,200,200), (box_x, box_y, box_width, box_height), 2)
+        pygame.draw.rect(screen, (215,43,43), (box_x, box_y, fill_width, box_height))
 
-        # Draw the slider handle (the draggable part)
-        pygame.draw.rect(screen, (255, 0, 0), (slider_handle_x, slider_y - (slider_handle_height - slider_height) // 2, slider_handle_width, slider_handle_height))
+        # Draw the slider if visible
+        if slider_visible:
+            # Draw the slider background (the bar)
+            pygame.draw.rect(screen, (200, 200, 200), (slider_x, slider_y, slider_width, slider_height))
 
-        # Display the slider value
-        slider_value_text = FONT.render(f"Value: {slider_value:.2f}", True, TEXT_COLOR)
-        screen.blit(slider_value_text, (WIDTH // 2 - slider_value_text.get_width() // 2, slider_y - 50))
+            # Draw the slider handle (the draggable part)
+            pygame.draw.rect(screen, (255, 0, 0), (slider_handle_x, slider_y - (slider_handle_height - slider_height) // 2, slider_handle_width, slider_handle_height))
+
+            # Display the slider value
+            slider_value_text = FONT.render(f"Value: {slider_value:.2f}", True, TEXT_COLOR)
+            screen.blit(slider_value_text, (WIDTH // 2 - slider_value_text.get_width() // 2, slider_y - 50))
+
+    elif win:
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(win_image,(200,300))
+    
+    else:
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(lose_image,(200,200))
 
     # Update display
     pygame.display.flip()

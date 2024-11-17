@@ -27,7 +27,6 @@ class Mass(pygame.sprite.Sprite):
     self.color = color
     self.originalData = (radius, mass, self.pos.copy(), self.velocity.copy())
     self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-    pygame.draw.circle(self.image, self.color, (self.radius, self.radius), self.radius)
 
     # Set the rect attribute of the sprite
     self.rect = self.image.get_rect(center=self.pygame_position())
@@ -38,7 +37,6 @@ class Mass(pygame.sprite.Sprite):
     self.velocity = self.originalData[3].copy()
     # Recreate the image surface with the new color (if necessary)
     self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-    pygame.draw.circle(self.image, self.color, (self.radius, self.radius), self.radius)
     # Update the rect to reflect the new image size and position
     self.rect = self.image.get_rect(center=self.pygame_position())
 
@@ -72,7 +70,7 @@ class Mass(pygame.sprite.Sprite):
 
   def acceleration_due_to(self,other):
     ''' (Mass, Mass) -> np.array
-    
+
     all the physics of the project is here tbh'''
     G=6.67*10**-11
     relative_pos = self.get_position() - other.get_position() #position vector between Sun and Earthin Pixels
