@@ -36,7 +36,7 @@ slider_handle_width = 20  # Width of the slider handle
 slider_handle_height = 20  # Height of the slider handle
 
 # Initial slider value (percentage)
-slider_value = 0.5  # Value between 0 and 1 (50%)
+slider_value = 0.0  # Value between 0 and 1 (50%)
 slider_handle_x = slider_x + slider_value * (slider_width - slider_handle_width)  # Initial handle position
 
 # Variables
@@ -168,9 +168,8 @@ while running:
     trail.append(tuple(earth_pos))
     #if len(trail) > 1000:
         #trail.pop(0)
-
     # Update suns mass based on the slider
-    sun_mass = 0.01*(slider_value*sun.get_mass()) + 0.995*(sun.get_mass()) # y = 0.2x + 0.9 (scaled by mass of the sun)
+    sun_mass = 3*(slider_value*sun.originalData[1]) + 1*(sun.originalData[1]) # y = 0.2x + 0.9 (scaled by mass of the sun)
     sun.set_mass(sun_mass)
 
     # Clear screen
