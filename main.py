@@ -324,7 +324,6 @@ while running:
             screen.blit(slider_value_text, (WIDTH // 2 - slider_value_text.get_width() // 2, slider_y - 50))
 
     elif win:
-        screen.fill(BACKGROUND_COLOR)
         screen.blit(win_image,(200,300))
     
     else:
