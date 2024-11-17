@@ -98,7 +98,11 @@ box_width, box_height = 300, 40
 fill_width=(fuel_level/max_fuel)*box_width
 
 # Progress bar
+font = pygame.font.Font(None, 36)
 tag_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
+text_surface = font.render(tag_text, True, (255,0,0))
+text_rect = text_surface.get_rect(center=(box_x + box_width // 2, box_y - 20))  # Position above the box
+
 progress=0
 max_progress=100
 progress_box_x, progress_box_y = WIDTH//2, HEIGHT-50
@@ -223,6 +227,7 @@ while running:
     all_sprites.update()
 
     #draw progress box
+    screen.blit(text_surface, text_rect)
     pygame.draw.rect(screen, (90, 102, 92), (progress_box_x, progress_box_y, progress_box_width, progress_box_height), 2)
     pygame.draw.rect(screen, (222, 173, 45), (progress_box_x, progress_box_y, progress_fill_width, progress_box_height))
         
