@@ -198,7 +198,7 @@ while running:
     sun.set_mass(sun_mass)
 
     # Clear screen
-    screen.fill(BACKGROUND)
+    screen.blit(background_image,(0,0))
 
     # Draw trail
     if len(trail) > 1:
