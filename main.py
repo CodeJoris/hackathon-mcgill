@@ -98,6 +98,7 @@ box_width, box_height = 300, 40
 fill_width=(fuel_level/max_fuel)*box_width
 
 # Progress bar
+tag_text = f"Fuel Levels : {int(fuel_level)} / {max_fuel}"
 progress=0
 max_progress=100
 progress_box_x, progress_box_y = WIDTH//2, HEIGHT-50
