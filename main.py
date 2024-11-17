@@ -186,11 +186,15 @@ while running:
     if (pygame.sprite.collide_circle(earth, sun)):
         earth.restart()
         slider_value = 0.5
+        fuel_level = 100
+        fill_width = (fuel_level / max_fuel) * box_width
 
     for sprite in all_sprites:
         if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.top > HEIGHT):
             earth.restart()
             slider_value = 0.5
+            fuel_level = 100
+            fill_width = (fuel_level / max_fuel) * box_width
             break
 
     all_sprites.update()
