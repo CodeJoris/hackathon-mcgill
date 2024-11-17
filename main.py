@@ -62,7 +62,7 @@ sat_image.set_colorkey((255,255,255))
 BACKGROUND = (30, 30, 30)
 
 # Create Masses
-sun = m.Mass("Sun", 35, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
+sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
 earth = m.Mass("Earth", 25, 5.9722 * 10**27, (WIDTH / 2) + 300, HEIGHT / 2, (0, -1), (0, 0, 255))
 
 trail = []
@@ -94,6 +94,15 @@ max_fuel = 100
 box_x, box_y = 10, HEIGHT-50
 box_width, box_height = 300, 40
 fill_width=(fuel_level/max_fuel)*box_width
+
+# Progress bar
+progress=0
+max_progress=100
+progress_box_x, progress_box_y = WIDTH//2, HEIGHT-50
+progress_box_width, progress_box_height = 300, 40
+progress_fill_width=(progress/max_progress)*progress_box_width
+
+
 
 # Add masses to group
 all_sprites = pygame.sprite.Group()
@@ -193,8 +202,17 @@ while running:
             slider_value = 0.5
             break
 
+    # velocity earth
+    if earth.norm_velocity() > 1.5:
+        progress += 0.026
+    progress_fill_width=(progress/max_progress)*progress_box_width
+
     all_sprites.update()
 
+    #draw progress box
+    pygame.draw.rect(screen, (90, 102, 92), (progress_box_x, progress_box_y, progress_box_width, progress_box_height), 2)
+    pygame.draw.rect(screen, (222, 173, 45), (progress_box_x, progress_box_y, progress_fill_width, progress_box_height))
+        
     #draw rectangles fuel box
     pygame.draw.rect(screen, (200,200,200), (box_x, box_y, box_width, box_height), 2)
     pygame.draw.rect(screen, (215,43,43), (box_x, box_y, fill_width, box_height))
