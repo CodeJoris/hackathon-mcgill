@@ -63,7 +63,7 @@ sat_image.set_colorkey((255,255,255))
 # Background color
 background_image = pygame.image.load("stars.jpg")
 background_image = pygame.transform.scale(background_image, (1000, 1000))
-#BACKGROUND = (30, 30, 30)
+background_image.set_alpha(46)
 
 # Create Masses
 sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
@@ -181,7 +181,7 @@ while running:
     sun.set_mass(sun_mass)
 
     # Clear screen
-    screen.fill(BACKGROUND)
+    screen.blit(background_image,(0,0))
 
     # Draw trail
     if len(trail) > 1:
@@ -223,7 +223,7 @@ while running:
             break
 
     # velocity earth
-    if earth.norm_velocity() > 1.5:
+    if earth.norm_velocity() > 2:
         progress += 0.026
     progress_fill_width=(progress/max_progress)*progress_box_width
 
