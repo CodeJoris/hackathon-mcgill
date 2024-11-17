@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import sys, pygame, os
 from pygame.locals import *
@@ -184,17 +186,24 @@ while running:
     screen.blit(text_surface, text_rect)
     
     if (pygame.sprite.collide_circle(earth, sun)):
+        time.sleep(3)
         earth.restart()
         slider_value = 0.5
         fuel_level = 100
+        trail.clear()
+        trail_colors.clear()
+
         fill_width = (fuel_level / max_fuel) * box_width
 
     for sprite in all_sprites:
-        if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.top > HEIGHT):
+        if (sprite.rect.x < 0 or sprite.rect.right > WIDTH or sprite.rect.y < 0 or sprite.rect.bottom > HEIGHT):
+            time.sleep(3)
             earth.restart()
             slider_value = 0.5
             fuel_level = 100
             fill_width = (fuel_level / max_fuel) * box_width
+            trail.clear()
+            trail_colors.clear()
             break
 
     all_sprites.update()
