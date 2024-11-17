@@ -58,6 +58,7 @@ def initialize_slider():
     slider_visible = False  # Controls whether the slider is visible
     dragging = False        # Tracks if the slider handle is being dragged
 
+# Velocity vector helper function
 def restart():
     global slider_value, fuel_level, fill_width, lives, progress
     progress=0
@@ -70,6 +71,21 @@ def restart():
     trail_colors.clear()
     fill_width = (fuel_level / max_fuel) * box_width
     lives -= 1
+
+# Velocity vector helper function
+def velocity_vector():
+    position = earth.get_position()
+    velocity = earth.get_velocity() 
+
+    # Scale the velocity vector for visibility
+    scale = 50  # Adjust as needed
+    scaled_velocity = velocity * scale
+
+    end_position = position + scaled_velocity
+
+    # Draw the velocity vector
+    pygame.draw.line(screen, (250, 0, 0), position, end_position, width=2)  # Red line for velocity
+    pygame.draw.circle(screen, (0, 255, 0), position.astype(int), 4)  # Small green circle at Earth's position
 
 
 # Create screen and clock
@@ -98,10 +114,10 @@ lives_image.set_colorkey((255,255,255))
 # Win lose screens
 font = pygame.font.Font(None, 36)
 lose_text_surface = font.render('You Lose', True, (255,0,0))
-lose_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2))
+lose_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2 - 100))
 
 win_text_surface = font.render('You WIN', True, (255,0,0))
-win_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2))
+win_text = lose_text_surface.get_rect(center=(WIDTH//2, HEIGHT//2 -100))
 
 
 
@@ -156,19 +172,6 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(sun, earth)
 
 
-def velocity_vector():
-    position = earth.get_position()
-    velocity = earth.get_velocity() 
-
-    # Scale the velocity vector for visibility
-    scale = 50  # Adjust as needed
-    scaled_velocity = velocity * scale
-
-    end_position = position + scaled_velocity
-
-    # Draw the velocity vector
-    pygame.draw.line(screen, (250, 0, 0), position, end_position, width=2)  # Red line for velocity
-    pygame.draw.circle(screen, (0, 255, 0), position.astype(int), 4)  # Small green circle at Earth's position
 
     
 # Variables
@@ -325,11 +328,9 @@ while running:
             screen.blit(slider_value_text, (WIDTH // 2 - slider_value_text.get_width() // 2, slider_y - 50))
 
     elif win:
-        screen.fill(BACKGROUND_COLOR)
         screen.blit(win_text_surface,win_text)
     
     elif lose:
-        screen.fill(BACKGROUND_COLOR)
         screen.blit(lose_text_surface,lose_text)
 
     # Update display
