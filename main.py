@@ -61,7 +61,9 @@ sat_image.set_colorkey((255,255,255))
 
 
 # Background color
-BACKGROUND = (30, 30, 30)
+background_image = pygame.image.load("stars.jpg")
+background_image = pygame.transform.scale(background_image, (1000, 1000))
+#BACKGROUND = (30, 30, 30)
 
 # Create Masses
 sun = m.Mass("Sun", 25, 1.989 * 10**30, WIDTH / 2, HEIGHT / 2, (0, 0), (255, 255, 0))
@@ -117,6 +119,7 @@ all_sprites.add(sun, earth)
 
 # Main loop
 while running:
+    screen.blit(background_image, (0, 0))
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
