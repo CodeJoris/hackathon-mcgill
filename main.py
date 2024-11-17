@@ -98,7 +98,7 @@ sun_image = pygame.transform.scale(sun_image,sun_size)
 sun_image.set_colorkey((255,255,255))
 
 #Image of the Satellite
-sat_image = pygame.image.load('assests/satellite.jpg').convert_alpha()
+sat_image = pygame.image.load('assets/satellite.jpg').convert_alpha()
 sat_size = (50,50)
 sat_image = pygame.transform.scale(sat_image,sat_size)
 sat_image.set_colorkey((255,255,255))
